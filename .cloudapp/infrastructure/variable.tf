@@ -129,13 +129,11 @@ variable "clb_attachment_port" {
   default = 80
 }
 
-# CLB 后端服务权重
+# CLB 后端服务权重（需要根据实例数量调整权重）
 variable "clb_attachment_weight" {
   type    = number
-  default = 100
+  default = 50
 }
-
-
 
 
 # ==========================================================

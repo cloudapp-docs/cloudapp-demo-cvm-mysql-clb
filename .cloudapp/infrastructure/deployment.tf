@@ -43,6 +43,9 @@ resource "tencentcloud_instance" "demo_cvm" {
   # CVM 密码（由上方 random_password 随机密码生成）
   password = random_password.cvm_password.result
 
+  # 实例数量
+  count = 2
+
   # 启动脚本
   user_data_raw = <<-EOT
 #!/bin/bash
@@ -139,15 +142,32 @@ resource "tencentcloud_clb_listener_rule" "api_http_rule" {
   url = var.clb_rule_url
 }
 
-# CLB 后端服务
-resource "tencentcloud_clb_attachment" "api_http_attachment" {
+# CLB 后端服务1
+resource "tencentcloud_clb_attachment" "api_http_attachment1" {
   clb_id      = tencentcloud_clb_instance.open_clb.id
   listener_id = tencentcloud_clb_listener.http_listener.id
   rule_id     = tencentcloud_clb_listener_rule.api_http_rule.id
 
   targets {
     # CVM 实例ID（需替换成真实的实例ID）
-    instance_id = tencentcloud_instance.demo_cvm.id
+    instance_id = tencentcloud_instance.demo_cvm[0].id
+    # 端口
+    port = var.clb_attachment_port
+    # 权重
+    weight = var.clb_attachment_weight
+  }
+}
+
+
+# CLB 后端服务2
+resource "tencentcloud_clb_attachment" "api_http_attachment2" {
+  clb_id      = tencentcloud_clb_instance.open_clb.id
+  listener_id = tencentcloud_clb_listener.http_listener.id
+  rule_id     = tencentcloud_clb_listener_rule.api_http_rule.id
+
+  targets {
+    # CVM 实例ID（需替换成真实的实例ID）
+    instance_id = tencentcloud_instance.demo_cvm[1].id
     # 端口
     port = var.clb_attachment_port
     # 权重

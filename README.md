@@ -1,6 +1,6 @@
 # 云应用模板-CVM、MySQL、CLB
 
-> 包含云资源：CVM实例、MySQL数据库、CLB负载均衡
+> 包含云资源：CVM实例（2台）、MySQL数据库、CLB负载均衡
 
 ## 目录说明
 
