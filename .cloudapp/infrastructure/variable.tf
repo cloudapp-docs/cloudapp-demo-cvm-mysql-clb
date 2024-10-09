@@ -3,10 +3,16 @@
 # ==========================================================
 
 # CVM 镜像ID
-variable "cvm_image_id" {
-  type    = string
-  default = "img-o68xyn9q"
+variable "app_cvm_image" {
+  type = object({
+    image_id = string
+  })
+
+  default = {
+    image_id = "img-o68xyn9q"
+  }
 }
+
 
 # CVM 系统盘类型
 variable "cvm_system_disk_type" {
@@ -93,30 +99,6 @@ variable "clb_network_type" {
   default = "OPEN"
 }
 
-# CLB 监听器名称
-variable "clb_listener_name" {
-  type    = string
-  default = "http_listener"
-}
-
-# CLB 监听器协议
-variable "clb_listener_protocol" {
-  type    = string
-  default = "HTTP"
-}
-
-# CLB 监听器端口
-variable "clb_listener_port" {
-  type    = number
-  default = 80
-}
-
-# CLB 转发规则域名（需替换成真实的域名）
-variable "clb_rule_domain" {
-  type    = string
-  default = "cloudapp.tencent.com"
-}
-
 # CLB 转发规则路径
 variable "clb_rule_url" {
   type    = string
@@ -132,7 +114,7 @@ variable "clb_attachment_port" {
 # CLB 后端服务权重（需要根据实例数量调整权重）
 variable "clb_attachment_weight" {
   type    = number
-  default = 50
+  default = 100
 }
 
 
@@ -177,6 +159,17 @@ variable "sg" {
   })
 }
 
+variable "app_certification" {
+   type = object({
+     certId = string
+   })
+}
+
+variable "app_domain" {
+   type = object({
+     domain = string
+   })
+}
 
 
 # ==========================================================

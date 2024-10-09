@@ -1,18 +1,38 @@
 # 应用 ID，需修改成自己的应用 ID
-id: ${packageId}
+id: pkg-bfxlwhef
 
 # 自定义安装参数，通过 widget 来声明安装表单获取
 args:
   - name: app_target
     label: 目标网络
     widget: subnet-select
+
   - name: cvm_type
     label: 云服务器类型
     widget: cvm-instance-type-select
     region: ${app_target.region}
     zone: ${app_target.subnet.zone}
+
+  - name: app_cvm_image
+    label: cvm 镜像
+    widget: image-select
+    region: ${app_target.region}
+    instanceType: ${cvm_type.instance_type}
+    incompleteTips: 请先选择 cvm 机型
+
   - name: sg
     label: 安全组
     widget: security-group-select
     regions:
       - ${app_target.region}
+
+  - name: app_certification
+    label: SSL 证书
+    widget: certificate-select
+    optional: true
+
+  - name: app_domain
+    label: 域名
+    widget: domain-input
+    optional: true
+    certId: ${app_certification.certId}

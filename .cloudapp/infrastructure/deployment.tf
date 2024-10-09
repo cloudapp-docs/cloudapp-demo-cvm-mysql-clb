@@ -8,7 +8,7 @@ resource "random_password" "cvm_password" {
 # CVM
 resource "tencentcloud_instance" "demo_cvm" {
   # CVM 镜像ID
-  image_id = var.cvm_image_id
+  image_id = var.app_cvm_image.image_id
 
   # CVM 机型
   instance_type = var.cvm_type.instance_type
@@ -124,12 +124,16 @@ resource "tencentcloud_clb_instance" "open_clb" {
   subnet_id = var.app_target.subnet.id
 }
 
-# CLB 监听器
+################################################
+################## http 路由 ###################
+################################################
+
+# CLB http 监听器
 resource "tencentcloud_clb_listener" "http_listener" {
   clb_id        = tencentcloud_clb_instance.open_clb.id
-  listener_name = var.clb_listener_name
-  port          = var.clb_listener_port
-  protocol      = var.clb_listener_protocol
+  listener_name = "http_listener"
+  port          = 80
+  protocol      = "HTTP"
 }
 
 # CLB 转发规则
@@ -137,7 +141,7 @@ resource "tencentcloud_clb_listener_rule" "api_http_rule" {
   clb_id      = tencentcloud_clb_instance.open_clb.id
   listener_id = tencentcloud_clb_listener.http_listener.id
   # 转发规则的域名
-  domain = var.clb_rule_domain
+  domain = var.app_domain.domain
   # 转发规则的路径
   url = var.clb_rule_url
 }
@@ -164,6 +168,64 @@ resource "tencentcloud_clb_attachment" "api_http_attachment2" {
   clb_id      = tencentcloud_clb_instance.open_clb.id
   listener_id = tencentcloud_clb_listener.http_listener.id
   rule_id     = tencentcloud_clb_listener_rule.api_http_rule.id
+
+  targets {
+    # CVM 实例ID（需替换成真实的实例ID）
+    instance_id = tencentcloud_instance.demo_cvm[1].id
+    # 端口
+    port = var.clb_attachment_port
+    # 权重
+    weight = var.clb_attachment_weight
+  }
+}
+
+
+################################################
+################## https 路由 ###################
+################################################
+
+# CLB https 监听器
+resource "tencentcloud_clb_listener" "https_listener" {
+  clb_id        = tencentcloud_clb_instance.open_clb.id
+  listener_name = "https_listener"
+  port          = 443
+  protocol      = "HTTPS"
+  certificate_id       = var.app_certification.certId
+  certificate_ssl_mode = "UNIDIRECTIONAL"
+}
+
+# CLB 转发规则
+resource "tencentcloud_clb_listener_rule" "api_https_rule" {
+  clb_id      = tencentcloud_clb_instance.open_clb.id
+  listener_id = tencentcloud_clb_listener.https_listener.id
+  # 转发规则的域名
+  domain = var.app_domain.domain
+  # 转发规则的路径
+  url = var.clb_rule_url
+}
+
+# CLB 后端服务1
+resource "tencentcloud_clb_attachment" "api_https_attachment1" {
+  clb_id      = tencentcloud_clb_instance.open_clb.id
+  listener_id = tencentcloud_clb_listener.https_listener.id
+  rule_id     = tencentcloud_clb_listener_rule.api_https_rule.id
+
+  targets {
+    # CVM 实例ID（需替换成真实的实例ID）
+    instance_id = tencentcloud_instance.demo_cvm[0].id
+    # 端口
+    port = var.clb_attachment_port
+    # 权重
+    weight = var.clb_attachment_weight
+  }
+}
+
+
+# CLB 后端服务2
+resource "tencentcloud_clb_attachment" "api_https_attachment2" {
+  clb_id      = tencentcloud_clb_instance.open_clb.id
+  listener_id = tencentcloud_clb_listener.https_listener.id
+  rule_id     = tencentcloud_clb_listener_rule.api_https_rule.id
 
   targets {
     # CVM 实例ID（需替换成真实的实例ID）

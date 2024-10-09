@@ -22,3 +22,5 @@
 - 需要将 ```.cloudapp/scripts``` 目录下的脚本，按照自身项目需求修改，并打包到CVM镜像的 ```/usr/local/cloudapp``` 目录下，在安装实例时，会执行相应的启动脚本
 
 - 在CVM初始化时，将会自动执行 ```/usr/local/cloudapp/startup.sh``` 启动脚本，和 ```/usr/local/cloudapp/init-db.sh``` 数据库初始化脚本
+
+- 安装的时候如果输入了域名，将域名解析到 CLB 的 VIP，即可通过 http、https 访问服务
