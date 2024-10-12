@@ -122,6 +122,8 @@ resource "tencentcloud_clb_instance" "open_clb" {
   vpc_id = var.app_target.vpc.id
   # 子网 ID
   subnet_id = var.app_target.subnet.id
+  # 启用默认放通，即 Target 放通来自 CLB 的流量
+  load_balancer_pass_to_target = true
 }
 
 ################################################
@@ -235,4 +237,16 @@ resource "tencentcloud_clb_attachment" "api_https_attachment2" {
     # 权重
     weight = var.clb_attachment_weight
   }
+}
+
+
+
+output "main" {
+  value = "http://${tencentcloud_clb_instance.open_clb.clb_vips[0]}"
+  description = "应用入口"
+}
+
+output "entry_domain" {
+  value = "https://${var.app_domain.domain}"
+  description = "应用入口（域名访问）"
 }
